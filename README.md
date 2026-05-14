@@ -16,7 +16,7 @@ Weakly-supervised temporal action localization with class-aware action-core cali
 </div>
 
 <p align="center">
-  <img src="assets/framework.svg" alt="CAPSNet framework" width="96%">
+  <img src="https://anonymous.4open.science/api/repo/CAPSNet-1592/file/assets/framework.svg" alt="CAPSNet framework" width="96%">
 </p>
 
 ## Overview
