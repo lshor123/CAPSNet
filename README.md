@@ -2,95 +2,68 @@
 
 # CAPSNet
 
-### Reliability Calibration for Proposal-Level Weakly-Supervised Temporal Action Localization
+### Calibrating Proposal-Score Reliability for Weakly Supervised Temporal Action Localization
 
-Weakly-supervised temporal action localization with class-aware action-core calibration and cross-video proposal support.
+Proposal-level WTAL with internal action-core calibration and external cross-video proposal support.
 
 <p>
   <img alt="Task" src="https://img.shields.io/badge/task-WTAL-4051b5">
   <img alt="Framework" src="https://img.shields.io/badge/framework-PyTorch-ee4c2c?logo=pytorch&logoColor=white">
-  <img alt="Datasets" src="https://img.shields.io/badge/datasets-THUMOS14%20%7C%20ActivityNet%20v1.3-1f8a70">
+  <img alt="Dataset" src="https://img.shields.io/badge/dataset-THUMOS14-1f8a70">
   <img alt="Status" src="https://img.shields.io/badge/status-research%20code-555555">
 </p>
 
 </div>
 
 <p align="center">
-  <img src="https://anonymous.4open.science/api/repo/CAPSNet-1592/file/assets/framework.svg?v=3f3c3e74" alt="CAPSNet framework" width="96%">
+  <img src="assets/framework.svg" alt="CAPSNet framework" width="96%">
 </p>
 
 ## Overview
 
-CAPSNet is a proposal-level weakly-supervised temporal action localization (WTAL) framework. It starts from temporal proposals and calibrates proposal scores without changing the proposal-level prediction interface. The key idea is that a high proposal score is not always reliable: it may be driven by context, a short discriminative fragment, or an absent class that correlates with the current scene.
+CAPSNet is a dual reliability calibration framework for proposal-level weakly-supervised temporal action localization (WTAL). It keeps the proposal-level prediction interface unchanged and calibrates proposal-class scores before final ranking. The core observation is that a high proposal score may come from context, a short discriminative fragment, or a class absent from the video but correlated with the scene of a present action.
 
-CAPSNet calibrates proposal reliability from two complementary views:
+CAPSNet calibrates proposal-score reliability from two complementary views:
 
-- **Class-Aware Action-Core Proportion (CAP)** separates action-core evidence from contextual responses inside each ordered proposal RoI.
-- **Cross-Video Proposal Support (CPS)** retrieves same-class positive supports from other videos and edits proposal logits through present-versus-absent support competition.
-- **Proposal-level calibration** keeps the P-MIL-style proposal scorer as the detection interface and improves the reliability of the final proposal-class ranking.
+- **Class-Aware Action-Core Proportion (CAP)** estimates class-specific action-core dominance over ordered RoI bins, separates action-core evidence from contextual response, and selectively corrects under-confident proposals supported by strong action-core evidence.
+- **Cross-Video Proposal Support (CPS)** retrieves same-class support proposals from other videos and contrasts them with absent-class supports to calibrate logits affected by context or class confusion.
+- **Proposal-level calibration** keeps the proposal source and detection pipeline unchanged, then re-ranks proposal-class pairs with internal and external reliability cues.
 
 ## Abstract
 
-Weakly-supervised temporal action localization (WTAL) aims to localize action instances using only video-level labels. Proposal-level MIL alleviates the train-test mismatch of snippet-based WTAL by scoring temporal proposals during both training and inference. However, proposal scores are not necessarily reliable: a high score may be dominated by contextual evidence, a short discriminative fragment, or absent classes correlated with the scene of present actions. We propose CAPSNet, a dual reliability calibration framework for proposal-level WTAL. Without changing the proposal-level prediction interface, CAPSNet calibrates proposal scores from two complementary perspectives. First, Class-Aware Action-Core Proportion (CAP) models ordered RoI bins inside each proposal to estimate class-specific action-core dominance, separating action-core evidence from contextual responses and selectively correcting under-confident proposals supported by strong action-core evidence. Second, Cross-Video Proposal Support (CPS) retrieves same-class positive supports from other videos and uses present-versus-absent support competition to suppress context-driven and class-confused logits. Together, CAP and CPS provide internal and external reliability cues for calibrated proposal scoring. Extensive experiments on THUMOS14 and ActivityNet v1.3 show that CAPSNet consistently improves over the proposal-level MIL baseline and achieves competitive performance against state-of-the-art WTAL methods.
+Weakly-supervised temporal action localization (WTAL) aims to localize action instances using only video-level labels. Proposal-level MIL reduces the train-test mismatch of snippet-based WTAL by scoring temporal proposals during both training and inference. The proposal score itself, however, can still be unreliable: a high response may come from contextual evidence, a short discriminative fragment, or a class absent from the video but correlated with the scene of a present action. In this paper, we propose a dual reliability calibration framework (CAPSNet) for proposal-level WTAL. CAPSNet keeps the proposal-level prediction interface unchanged and calibrates proposal scores from two complementary views. Class-Aware Action-Core Proportion (CAP) estimates class-specific action-core dominance over ordered RoI bins, separates action-core evidence from contextual response, and selectively corrects under-confident proposals supported by strong action-core evidence. Cross-Video Proposal Support (CPS) retrieves same-class support proposals from other videos and contrasts them with absent-class supports to calibrate logits affected by context or class confusion. Together, CAP and CPS provide internal and external reliability cues for calibrated proposal scoring. Our model achieves better detection performance than previous state-of-the-art WTAL methods on standard benchmarks.
 
 ## Results
 
 ### THUMOS14
 
-Our experimental results on the THUMOS14 dataset are as follows.
-
-| Method | mAP@0.1 | mAP@0.2 | mAP@0.3 | mAP@0.4 | mAP@0.5 | mAP@0.6 | mAP@0.7 | AVG |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| CAPSNet | 73.6 | 68.7 | 60.4 | 50.5 | 41.2 | 28.4 | 16.0 | 48.4 |
+| Method | Backbone | mAP@0.1 | mAP@0.2 | mAP@0.3 | mAP@0.4 | mAP@0.5 | mAP@0.6 | mAP@0.7 | AVG 0.1:0.5 | AVG 0.3:0.7 | AVG 0.1:0.7 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| CAPSNet | P-MIL | 73.6 | 68.7 | 60.4 | 50.5 | 41.2 | 28.4 | 16.0 | 58.9 | 39.3 | 48.4 |
+| CAPSNet | SEAL | 79.8 | 74.9 | 67.3 | 56.2 | 44.9 | 32.2 | 19.3 | 64.6 | 44.0 | 53.5 |
 
 ### ActivityNet v1.3
-
-Our experimental results on the ActivityNet v1.3 dataset are as follows.
 
 | Method | mAP@0.5 | mAP@0.75 | mAP@0.95 | AVG |
 | --- | ---: | ---: | ---: | ---: |
 | CAPSNet | 43.3 | 26.8 | 6.2 | 27.0 |
 
-## Repository Layout
-
-```text
-.
-|-- assets/
-|   `-- framework.svg
-|-- THUMOS14/
-|   `-- run_pcm_stage1_v3_simplified/
-|       |-- main.py
-|       |-- model.py
-|       |-- dataset.py
-|       |-- options.py
-|       |-- utils.py
-|       |-- eval_detection.py
-|       |-- opt.txt
-|       `-- mAP-results.log
-`-- paper/
-    `-- versions/00_current_CAPSNet/
-```
-
 ## Requirements
 
-The code is implemented with PyTorch and expects a CUDA-capable environment.
+Experiments are run on an NVIDIA RTX 4090 GPU. Main library versions:
 
-```bash
-conda create -n capsnet python=3.9 -y
-conda activate capsnet
-
-# Install the PyTorch build that matches your CUDA version:
-# https://pytorch.org/get-started/locally/
-pip install torch torchvision
-
-pip install numpy pandas joblib tensorboard
-```
-
-The experiments use two-stream I3D features with 2048 dimensions. The code calls `torchvision.ops.roi_align`, so `torch` and `torchvision` must be ABI-compatible.
+| Library | Version |
+| --- | --- |
+| Python | 3.10.19 |
+| CUDA | 12.1 |
+| PyTorch | 2.1.2 |
+| torchvision | 0.16.2 |
+| NumPy | 1.26.4 |
+| pandas | 2.3.3 |
+| joblib | 1.5.3 |
+| TensorBoard | 2.20.0 |
 
 ## Data Preparation
-
-### THUMOS14
 
 Place THUMOS14 features and annotations under `--dataset_root` with the following layout:
 
@@ -105,7 +78,7 @@ Thumos14reduced/
     `-- Ambiguous_test.txt
 ```
 
-Place proposal JSON files under the running directory:
+Place external proposal JSON files under the running directory:
 
 ```text
 proposals/
@@ -123,16 +96,18 @@ Each proposal item should contain at least:
 }
 ```
 
-For THUMOS14, CAPSNet uses proposal boundaries from the external proposal source. The proposal labels and scores are not required by the core THUMOS14 proposal scorer.
+For THUMOS14, CAPSNet uses proposal boundaries from the external proposal source. Proposal labels and scores are not required by the core THUMOS14 proposal scorer.
 
 ## Usage
 
 ### Train on THUMOS14
 
+Run from the THUMOS14 experiment directory so that relative `proposals/` paths resolve correctly:
+
 ```bash
 cd THUMOS14/run_pcm_stage1_v3_simplified
 
-python main.py \
+python code_backup/main.py \
   --run_type train \
   --dataset_name Thumos14reduced \
   --dataset_root /path/to/Thumos14reduced \
@@ -141,10 +116,10 @@ python main.py \
   --interval 2
 ```
 
-For staged CPS tuning from a pretrained CAP or base checkpoint:
+For staged CPS tuning from a pretrained CAP or Base checkpoint:
 
 ```bash
-python main.py \
+python code_backup/main.py \
   --run_type train \
   --dataset_name Thumos14reduced \
   --dataset_root /path/to/Thumos14reduced \
@@ -161,40 +136,16 @@ python main.py \
 ```bash
 cd THUMOS14/run_pcm_stage1_v3_simplified
 
-python main.py \
+python code_backup/main.py \
   --run_type test \
   --dataset_name Thumos14reduced \
   --dataset_root /path/to/Thumos14reduced \
   --pretrained_ckpt /path/to/best_model.pkl
 ```
 
-## Reproducibility Notes
-
-- Training writes a full argument snapshot to `opt.txt`.
-- Detection results are appended to `mAP-results.log`.
-- Training automatically copies the current Python source files into `code_backup/` inside the experiment directory.
-- The controlled baseline in the paper is the non-fused P-MIL-style proposal scorer under the same proposal source; literature comparison rows may use the original fused results reported by prior work.
-- Results can vary with proposal quality, feature preprocessing, CUDA/cuDNN versions, and staged checkpoint selection.
-
-## Paper
-
-The paper source is included under:
-
-```text
-paper/versions/00_current_CAPSNet/
-```
-
-Current title:
-
-```text
-CAPSNet: Reliability Calibration for Proposal-Level Weakly-Supervised Temporal Action Localization
-```
-
-If you use this repository, please cite the final paper once the official bibliographic record is available.
-
 ## Acknowledgements
 
-This project builds on the proposal-level WTAL line of work, especially proposal-level MIL for weakly-supervised temporal action localization and external S-MIL proposal generation. We thank the authors of the public WTAL datasets, feature releases, and evaluation protocols used by the community.
+This project builds on proposal-level MIL for weakly-supervised temporal action localization, external S-MIL proposal generation, and the SEAL WTAL backbone used in the stronger-backbone experiments. We thank the authors of the public WTAL datasets, feature releases, and evaluation protocols used by the community.
 
 ## License
 
