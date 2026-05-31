@@ -50,7 +50,7 @@ Weakly-supervised temporal action localization (WTAL) aims to localize action in
 
 ## Requirements
 
-Experiments are run on an NVIDIA RTX 4090 GPU. Main library versions:
+Experiments are run on an NVIDIA RTX 3090 GPU. Main library versions:
 
 | Library | Version |
 | --- | --- |
@@ -105,42 +105,14 @@ For THUMOS14, CAPSNet uses proposal boundaries from the external proposal source
 Run from the THUMOS14 experiment directory so that relative `proposals/` paths resolve correctly:
 
 ```bash
-cd THUMOS14/run_pcm_stage1_v3_simplified
-
-python code_backup/main.py \
-  --run_type train \
-  --dataset_name Thumos14reduced \
-  --dataset_root /path/to/Thumos14reduced \
-  --exp_dir run_capsnet_thumos \
-  --max_epoch 500 \
-  --interval 2
-```
-
-For staged CPS tuning from a pretrained CAP or Base checkpoint:
-
-```bash
-python code_backup/main.py \
-  --run_type train \
-  --dataset_name Thumos14reduced \
-  --dataset_root /path/to/Thumos14reduced \
-  --exp_dir run_capsnet_thumos_cps \
-  --pretrained_ckpt /path/to/best_model.pkl \
-  --freeze_pcm_branches 1 \
-  --pcm_warmup_epoch 1 \
-  --max_epoch 500 \
-  --interval 2
+python main.py --exp_dir run_2  --max_epoch 400 --interval 5
 ```
 
 ### Evaluate on THUMOS14
 
 ```bash
-cd THUMOS14/run_pcm_stage1_v3_simplified
+python main.py --run_type test --pretrained_ckpt outputs/ckpt/best_model.pkl
 
-python code_backup/main.py \
-  --run_type test \
-  --dataset_name Thumos14reduced \
-  --dataset_root /path/to/Thumos14reduced \
-  --pretrained_ckpt /path/to/best_model.pkl
 ```
 
 ## Acknowledgements
