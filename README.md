@@ -105,7 +105,7 @@ For THUMOS14, CAPSNet uses proposal boundaries from the external proposal source
 Run from the THUMOS14 experiment directory so that relative `proposals/` paths resolve correctly:
 
 ```bash
-python main.py --exp_dir run_2  --max_epoch 400 --interval 5
+python main.py --exp_dir run  --max_epoch 400 --interval 5
 ```
 
 ### Evaluate on THUMOS14
