@@ -16,7 +16,7 @@ Proposal-level WTAL with internal action-core calibration and external cross-vid
 </div>
 
 <p align="center">
-  <img src="assets/framework.svg" alt="CAPSNet framework" width="96%">
+  <img src="assets/framework.svg?v=20260531" alt="CAPSNet framework" width="96%">
 </p>
 
 ## Overview
