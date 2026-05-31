@@ -64,7 +64,7 @@ Experiments are run on an NVIDIA RTX 3090 GPU. Main library versions:
 | TensorBoard | 2.20.0 |
 
 ## Data Preparation
-
+The THUMOS14 features, annotations, and external S-MIL proposal files follow the data format used by [CVPR2023 P-MIL](https://github.com/RenHuan1999/CVPR2023_P-MIL). Please download or prepare the THUMOS14 data and proposal JSON files according to the Data Preparation section of that repository, then place them as below.
 Place THUMOS14 features and annotations under `--dataset_root` with the following layout:
 
 ```text
